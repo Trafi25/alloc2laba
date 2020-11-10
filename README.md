@@ -36,7 +36,8 @@ The function changes the size of the memory block with address addr to size byte
 
 ### Free memory function
 ```
-#Description of the PROTOTYPE algorithm: void mem_free (void * addr)```
+#Description of the PROTOTYPE algorithm: void mem_free (void * addr)
+```
 
 The function frees the previously allocated block of memory.
 ## DEMONSTRATION
