@@ -29,7 +29,8 @@ Each page has a header to keep track of the state of the page. The header consis
 The function allocates a block of memory of the specified size in size bytes. If the memory block was allocated successfully, it returns the address of the beginning of this block, otherwise it returns NULL.
 ### Reallocate function
 ```
-#Description of the PROTOTYPE algorithm: void * mem_realloc (void * addr, size_t size)```
+#Description of the PROTOTYPE algorithm: void * mem_realloc (void * addr, size_t size)
+```
 
 The function changes the size of the memory block with address addr to size bytes. In this case, the contents (all or part) of the old memory block are transferred to another memory block.
 
