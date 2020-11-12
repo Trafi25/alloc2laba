@@ -4,7 +4,7 @@ using namespace std;
 
 int main()
 {
-    PageAllocator allocator = PageAllocator(32 * 1024);
+    PageAllocator allocator = PageAllocator(40 * 1024);
     allocator.mem_dump();
 
     auto* loc1 = allocator.mem_alloc(200);  
@@ -20,7 +20,7 @@ int main()
     auto* loc7 = allocator.mem_alloc(5 * 1024);
     allocator.mem_dump();
     loc7 = allocator.mem_realloc(loc7, 32);
-    loc4 = allocator.mem_realloc(loc4, 4 * 1024);    
+    loc4 = allocator.mem_realloc(loc4, 4 * 1024);   
     allocator.mem_dump();
 
     allocator.mem_dump();

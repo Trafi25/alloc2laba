@@ -1,6 +1,7 @@
 #include <vector>
 #include <map>
 #include <cmath>
+using namespace std;
 
 class PageAllocator
 {
@@ -19,11 +20,11 @@ private:
         Divided,
         MultiplePage,
     };
-    struct Header
+    struct Header 
     {
         PageState state;
         size_t size;
-        void* HelperAddr; //указатель на следующий свободный блок для разделенной страницы
+        void* HelperAddr;
         unsigned short blocks;
     };
     struct BlockHeader
@@ -34,23 +35,15 @@ private:
     size_t const MinPageSize = 4 * 1024;
     size_t const MinBlockSize = 16;
     size_t AmountPages;
-
     void* HelperAddr;
 
-    std::vector<void*> FreePages;
-    std::map<void*, Header> Headers;
-    std::map<size_t, std::vector<void*>> FreePagesOfClass;
+    vector<void*> FreePages;
+    map<void*, Header> Headers;
+    map<size_t, vector<void*>> FreePagesOfClass;
 
-
-
-    void* GetAddrOfPage(void* addr);
-
-   
+    void* GetAddrOfPage(void* addr);   
     void* DivideFree(size_t classSize);    
     void* AllocateBlock(void* page);
-    void* MultyPages(size_t size);
-   
+    void* MultyPages(size_t size);   
     void FreeMulti(void* FirstPageAddr, size_t AmountPages);
-
-    void MoveMemory(void* addr, void* newAddr);
 };

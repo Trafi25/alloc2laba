@@ -7,11 +7,11 @@ using namespace std;
 
 PageAllocator::PageAllocator(size_t size)
 {
-    if (size < 4 * 1024) {
+    if (size < MinPageSize) {
         cerr << "ERROR\n";
         exit(EXIT_SUCCESS);
     }
-    AmountPages = ceil((double)size / MinPageSize);
+    AmountPages = ceil(size / MinPageSize);
     size = AmountPages * MinPageSize;
     HelperAddr = malloc(size);
     for (int i = 0; i < AmountPages; ++i)
@@ -32,8 +32,8 @@ void* PageAllocator::mem_alloc(size_t size)
 {
     if (size < MinPageSize / 2)
     {
-        auto next = (size_t)pow(2, ceil(log(size) / log(2)));
-        auto classSize = max(MinBlockSize, next);  
+        auto  newsize= (size_t)pow(2, ceil(log(size) / log(2)));
+        auto classSize = max(MinBlockSize, newsize);
         auto page = DivideFree(classSize);
         return AllocateBlock(page);
         
@@ -59,11 +59,11 @@ void* PageAllocator::DivideFree(size_t classSize)
     Headers[page].state = PageState::Divided;
     Headers[page].blocks = MinPageSize / classSize;    
 
-    for (int i = 0; i < Headers[page].blocks - 1; ++i)
+    for (int i = 0; i < Headers[page].blocks - 1; i++)
     {
         void* block = (int*)((char*)page + i);
         auto blockHeader = (BlockHeader*)block;
-        void* nextBlock = (int*)((char*)page + (i++));
+        void* nextBlock = (int*)((char*)page + (1+i));
         blockHeader->next = nextBlock;
     }
 
@@ -77,7 +77,7 @@ void* PageAllocator::AllocateBlock(void* page)
     auto next = ((BlockHeader*)addr)->next;
     Headers[page].HelperAddr= next;
     Headers[page].blocks--;
-    if (Headers[page].blocks == 0)
+    if (Headers[page].blocks == 0)  
     {
         auto pages = FreePagesOfClass[Headers[page].size];
         pages.clear();
@@ -89,7 +89,7 @@ void* PageAllocator::AllocateBlock(void* page)
 
 void* PageAllocator::MultyPages(size_t size)
 {
-    size_t amount = ceil((double)size / MinPageSize);
+    size_t amount = ceil(size / MinPageSize);
     if (amount > FreePages.size()) {
         cerr << "Need more space for Multiple page placements\n";
         exit(EXIT_SUCCESS);
@@ -119,7 +119,7 @@ void* PageAllocator::MultyPages(size_t size)
         Headers[page].blocks = amount;
         Headers[page].size = amount * MinPageSize;
 
-        FreePages.erase(remove(FreePages.begin(), FreePages.end(), page), FreePages.end());
+        FreePages.erase(FreePages.begin());
     }
     return pages.front();
 }
@@ -167,21 +167,13 @@ void* PageAllocator::mem_realloc(void* addr, size_t size)
     auto page = GetAddrOfPage(addr);
     mem_free(addr);
     auto newAddr = mem_alloc(size);
-    auto newPage = GetAddrOfPage(newAddr);  
-
-    
+    auto newPage = GetAddrOfPage(newAddr);      
 
     memcpy(addr, newAddr, min(Headers[page].size, Headers[newPage].size));
    
     return newAddr;
 }
-void PageAllocator::MoveMemory(void* addr, void* newAddr)
-{
-    auto page = GetAddrOfPage(addr);
-    auto newPage = GetAddrOfPage(newAddr);    
 
-    memcpy(addr, newAddr, min(Headers[page].size, Headers[newPage].size));
-}
 
 void PageAllocator::mem_dump()
 {
@@ -200,6 +192,8 @@ void PageAllocator::mem_dump()
     }
     cout << endl;
 }
+
+
 
 PageAllocator::~PageAllocator()
 {
